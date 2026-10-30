@@ -2,23 +2,25 @@
 <style>
 *{box-sizing:border-box}body{margin:auto;font-family:sans-serif;background:#111;color:#fff;padding:12px;max-width:600px}
 input,select,textarea,button{font:inherit;width:100%;padding:12px;margin:4px 0;border-radius:10px;border:1px solid #444;background:#222;color:#fff}
-button{background:#7c3aed;border:0}button.s{background:#333;width:auto;padding:8px 14px}
+button{background:#7c3aed;border:0}button.s{background:#333;width:auto;padding:8px 14px}button.g{background:#333}
 .c{background:#1b1b1b;border-radius:12px;padding:10px;margin:10px 0}.r{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 img.t{width:60px;height:100px;object-fit:cover;border-radius:6px}small{color:#aaa}
 </style></head><body>
 <div class="r"><h2 id="ttl" style="flex:1"></h2><button class="s" id="lg" onclick="tog()">EN / ع</button></div>
-<div id="hm"><div class="c"><input id="tp"><select id="du"><option>15</option><option selected>30</option><option>45</option><option>60</option></select><button id="mk" onclick="mkP()"></button></div><div id="pl"></div></div>
+<div id="hm"><div class="c"><input id="tp"><select id="du"><option>15</option><option selected>30</option><option>45</option><option>60</option></select><select id="gl"><option value="en">English script</option><option value="ar">سكريبت عربي</option></select>
+<button id="ai" onclick="aiP()"></button><button class="g" id="mk" onclick="mkP()"></button><small id="st"></small></div>
+<div class="c"><small id="kh"></small><input id="gk" type="password" autocomplete="off"><input id="gm"></div><div id="pl"></div></div>
 <div id="ed" hidden><button class="s" id="bk" onclick="home()"></button> <small id="sv"></small>
 <small id="nt" style="display:block"></small><div id="sc"></div><button class="s" id="ad" onclick="addS()"></button>
 <div class="c"><small id="al"></small><input type="file" accept="audio/*" onchange="aF=this.files[0]">
 <button id="ex" onclick="render()"></button><button id="sr" onclick="srt()"></button><div id="pg"></div><div id="out"></div></div></div>
 <script>
-const T={en:{title:'Video App',topic:'Video topic',mk:'Create project (template script)',bk:'← Back',ad:'+ Scene',ex:'Export video',sr:'Download SRT',al:'Background audio (optional, not saved)',del:'Delete',open:'Open',saved:'Saved ✓',nt:'The script is a template for now. Edit the text. AI comes next.',total:'Total seconds: ',hook:'Hook: a surprising fact about ',pt:'Point about ',end:'Follow for more!',sec:'Seconds'},
-ar:{title:'تطبيق الفيديو',topic:'موضوع الفيديو',mk:'إنشاء مشروع (نص قالب)',bk:'→ رجوع',ad:'+ مشهد',ex:'تصدير الفيديو',sr:'تحميل SRT',al:'صوت خلفية (اختياري، لا يُحفظ)',del:'حذف',open:'فتح',saved:'تم الحفظ ✓',nt:'النص قالب حالياً. عدّله. الذكاء الاصطناعي لاحقاً.',total:'مجموع الثواني: ',hook:'البداية: معلومة مفاجئة عن ',pt:'نقطة عن ',end:'تابعنا للمزيد!',sec:'ثواني'}};
+const T={en:{title:'Video App',topic:'Video topic',mk:'Create with template (no AI)',ai:'Create with AI ✨',bk:'← Back',ad:'+ Scene',ex:'Export video',sr:'Download SRT',al:'Background audio (optional, not saved)',del:'Delete',open:'Open',saved:'Saved ✓',nt:'Edit any text. Review facts before publishing.',total:'Total seconds: ',hook:'Hook: a surprising fact about ',pt:'Point about ',end:'Follow for more!',sec:'Seconds',key:'Gemini API key (stored on this phone only)',kh:'AI settings (key and model name):',need:'Type a topic first.',nokey:'Paste your Gemini key first.',wait:'Writing script… please wait',err:'AI error: '},
+ar:{title:'تطبيق الفيديو',topic:'موضوع الفيديو',mk:'إنشاء بنص قالب (بدون ذكاء اصطناعي)',ai:'إنشاء بالذكاء الاصطناعي ✨',bk:'→ رجوع',ad:'+ مشهد',ex:'تصدير الفيديو',sr:'تحميل SRT',al:'صوت خلفية (اختياري، لا يُحفظ)',del:'حذف',open:'فتح',saved:'تم الحفظ ✓',nt:'عدّل أي نص. راجع المعلومات قبل النشر.',total:'مجموع الثواني: ',hook:'البداية: معلومة مفاجئة عن ',pt:'نقطة عن ',end:'تابعنا للمزيد!',sec:'ثواني',key:'مفتاح Gemini (يُحفظ على هذا الهاتف فقط)',kh:'إعدادات الذكاء الاصطناعي (المفتاح واسم النموذج):',need:'اكتب الموضوع أولاً.',nokey:'الصق مفتاح Gemini أولاً.',wait:'جاري كتابة النص… انتظر',err:'خطأ الذكاء الاصطناعي: '}};
 let L='en';try{L=localStorage.lang||'en'}catch(e){}
 const t=k=>T[L][k],$=i=>document.getElementById(i),esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let cur=null,aF=null,tm;
-function ui(){document.documentElement.dir=L=='ar'?'rtl':'ltr';$('ttl').textContent=t('title');$('tp').placeholder=t('topic');['mk','bk','ad','ex','sr','nt','al'].forEach(k=>$(k).textContent=t(k));if(cur)scn()}
+function ui(){document.documentElement.dir=L=='ar'?'rtl':'ltr';$('ttl').textContent=t('title');$('tp').placeholder=t('topic');$('gk').placeholder=t('key');$('kh').textContent=t('kh');['mk','ai','bk','ad','ex','sr','nt','al'].forEach(k=>$(k).textContent=t(k));if(cur)scn()}
 function tog(){L=L=='en'?'ar':'en';try{localStorage.lang=L}catch(e){}ui();if(!cur)home()}
 const db=new Promise((ok,no)=>{const r=indexedDB.open('vapp',1);r.onupgradeneeded=()=>r.result.createObjectStore('p',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
 const tx=async(m,f)=>{const d=await db;return new Promise((ok,no)=>{const q=f(d.transaction('p',m).objectStore('p'));q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})};
@@ -30,6 +32,19 @@ async function delP(id){if(confirm('?')){await rm(id);home()}}
 function mkP(){const tp=$('tp').value.trim()||'...',d=+$('du').value,n=Math.max(3,Math.round(d/6)),sec=Math.round(d/n);const sc=[];
 for(let i=0;i<n;i++)sc.push({text:i==0?t('hook')+tp:i==n-1?t('end'):t('pt')+tp+' '+i,sec,img:''});
 cur={id:'p'+Date.now(),name:tp,lang:L,scenes:sc};put(cur).then(()=>openP(cur.id))}
+async function aiP(){const tp=$('tp').value.trim(),key=$('gk').value.trim(),model=$('gm').value.trim(),st=$('st');
+if(!tp){st.textContent=t('need');return}if(!key){st.textContent=t('nokey');return}
+try{localStorage.gk=key;localStorage.gm=model}catch(e){}
+const d=+$('du').value,lang=$('gl').value,n=Math.max(3,Math.round(d/6));
+const pr=`Write a ${d}-second vertical short-video script about: "${tp}". Language: ${lang=='ar'?'Arabic':'English'}. Return ONLY a JSON array of exactly ${n} scenes. Each scene is {"text":"narration and caption, max 18 words","sec":number}. Scene 1 is a strong, specific hook. The last scene is a call to action. The sec values must add up to ${d}. Be accurate and do not invent statistics or sources.`;
+st.textContent=t('wait');$('ai').disabled=true;
+try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts:[{text:pr}]}],generationConfig:{responseMimeType:'application/json'}})});
+const j=await r.json();if(!r.ok)throw new Error(r.status+' '+((j.error&&j.error.message)||''));
+const raw=j.candidates[0].content.parts.map(p=>p.text||'').join('').replace(/```json|```/g,'').trim();
+const arr=JSON.parse(raw);if(!Array.isArray(arr)||!arr.length)throw new Error('Bad answer');
+const sc=arr.map(s=>({text:String(s.text||''),sec:Math.max(1,Math.round(+s.sec||5)),img:''}));
+cur={id:'p'+Date.now(),name:tp,lang,scenes:sc};await put(cur);st.textContent='';openP(cur.id)}
+catch(e){st.textContent=t('err')+e.message}finally{$('ai').disabled=false}}
 function scn(){$('sc').innerHTML=cur.scenes.map((s,i)=>`<div class="c"><div class="r">${s.img?`<img class="t" src="${s.img}">`:''}<div style="flex:1"><textarea rows="3" oninput="u(${i},'text',this.value)">${esc(s.text)}</textarea><small>${t('sec')}</small><input type="number" min="1" max="60" value="${s.sec}" oninput="u(${i},'sec',+this.value||1)"></div></div>
 <input type="file" accept="image/*" onchange="pick(${i},this)"><div class="r"><button class="s" onclick="mv(${i},-1)">▲</button><button class="s" onclick="mv(${i},1)">▼</button><button class="s" onclick="say(${i})">🔊</button><button class="s" onclick="dl(${i})">✕</button></div></div>`).join('')+`<small>${t('total')}${cur.scenes.reduce((a,s)=>a+s.sec,0)}</small>`}
 function u(i,k,v){cur.scenes[i][k]=v;save()}
@@ -62,5 +77,6 @@ fr();await done;$('ex').disabled=false;$('pg').textContent='';
 const type=rec.mimeType||'video/webm',ext=type.includes('mp4')?'mp4':'webm',b=new Blob(ch,{type}),url=URL.createObjectURL(b);
 $('out').innerHTML=`<p>Format: ${ext.toUpperCase()}</p><video src="${url}" controls style="width:60%"></video>`;
 const bt=document.createElement('button');bt.textContent='Download .'+ext;bt.onclick=()=>get(b,'video.'+ext);$('out').appendChild(bt)}
+try{$('gk').value=localStorage.gk||'';$('gm').value=localStorage.gm||'gemini-2.5-flash-lite'}catch(e){$('gm').value='gemini-2.5-flash-lite'}
 ui();home();
 </script></body></html>
